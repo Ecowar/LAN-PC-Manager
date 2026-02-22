@@ -21,10 +21,22 @@
 ### 环境要求
 - Windows 系统
 - Python 3.7+
-
+- Pillow
+- psutil
+- mss
+- opencv-python
+- numpy
 ### 安装运行
 
 1. 克隆仓库
 ```bash
 git clone https://github.com/Ecowar/PC-Remote-Control.git
 cd PC-Remote-Control
+
+2.打开运行服务器.bat，会自动检测 Python 是否安装，自动安装缺失的依赖库
+
+3.启动 Web 服务并显示访问地址
+
+启动服务后，控制台会输出访问地址（如 http://本机IP:5002）
+在手机 / 另一台电脑的浏览器中输入该地址
+即可进入控制界面，开始远程管理电脑
