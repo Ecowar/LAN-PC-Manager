@@ -26,5 +26,5 @@
 
 1. 克隆仓库
 ```bash
-git clone https://github.com/你的用户名/PC-Remote-Control.git
+git clone https://github.com/Ecowar/PC-Remote-Control.git
 cd PC-Remote-Control
