@@ -1,0 +1,1782 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>电脑控制中心</title>
+<style>
+html, body {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    min-height: 100vh;
+    background: linear-gradient(135deg, #f0f2f5 0%, #e3e8f0 100%);
+    font-family: Arial, sans-serif;
+    color: #333;
+}
+.container {
+    padding: 15px;
+    max-width: 600px;
+    margin: 0 auto;
+}
+/* 顶部导航栏 */
+.nav-bar {
+    background: #fff;
+    border-radius: 14px;
+    padding: 10px;
+    margin-bottom: 16px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    justify-content: center;
+}
+.nav-btn {
+    flex: 1;
+    min-width: 80px;
+    padding: 10px;
+    font-size: 12px;
+    border: none;
+    border-radius: 8px;
+    color: white;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.1s ease;
+    font-weight: 500;
+}
+.nav-btn:hover {
+    transform: translateY(-1px);
+}
+.nav-btn.active {
+    box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.8) inset;
+}
+.card {
+    background: #fff;
+    border-radius: 14px;
+    padding: 20px;
+    margin-bottom: 16px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+.card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+}
+h2 {
+    font-size: 18px;
+    margin-top: 0;
+    margin-bottom: 14px;
+    color: #333;
+    display: flex;
+    align-items: center;
+}
+h2::before {
+    margin-right: 8px;
+}
+input {
+    width: 100%;
+    padding: 14px;
+    font-size: 15px;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    margin-bottom: 12px;
+    box-sizing: border-box;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+input:focus {
+    outline: none;
+    border-color: #007bff;
+    box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
+}
+button {
+    width: 100%;
+    padding: 15px;
+    font-size: 15px;
+    border: none;
+    border-radius: 10px;
+    color: white;
+    margin-bottom: 10px;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.1s ease, box-shadow 0.3s ease;
+    font-weight: 500;
+}
+button:hover {
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+button:active {
+    transform: translateY(1px);
+}
+.btn-blue {
+    background: linear-gradient(135deg, #007bff 0%, #0069d9 100%);
+}
+.btn-blue:hover {
+    background: linear-gradient(135deg, #0069d9 0%, #005cbf 100%);
+}
+.btn-red {
+    background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+}
+.btn-red:hover {
+    background: linear-gradient(135deg, #c82333 0%, #a71e2a 100%);
+}
+.btn-orange {
+    background: linear-gradient(135deg, #fd7e14 0%, #e96900 100%);
+}
+.btn-orange:hover {
+    background: linear-gradient(135deg, #e96900 0%, #d35400 100%);
+}
+.btn-green {
+    background: linear-gradient(135deg, #28a745 0%, #218838 100%);
+}
+.btn-green:hover {
+    background: linear-gradient(135deg, #218838 0%, #1e7e34 100%);
+}
+.btn-purple {
+    background: linear-gradient(135deg, #6f42c1 0%, #5a30a0 100%);
+}
+.btn-purple:hover {
+    background: linear-gradient(135deg, #5a30a0 0%, #4a278a 100%);
+}
+.btn-teal {
+    background: linear-gradient(135deg, #20c997 0%, #17a2b8 100%);
+}
+.btn-teal:hover {
+    background: linear-gradient(135deg, #17a2b8 0%, #138496 100%);
+}
+
+/* 帧率控制相关样式 */
+.fps-control {
+    position: relative;
+    display: inline-block;
+}
+
+.fps-dropdown {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    margin-top: 5px;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    min-width: 80px;
+    z-index: 1000;
+    overflow: hidden;
+}
+
+.fps-option {
+    padding: 8px 12px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background-color 0.2s ease;
+}
+
+.fps-option:hover {
+    background-color: #007bff;
+    color: white;
+}
+
+.fps-counter {
+    font-family: 'Courier New', monospace;
+    font-size: 14px;
+    font-weight: bold;
+    padding: 8px 12px;
+    background: #f8f9fa;
+    border-radius: 8px;
+    color: #28a745; /* 绿色，≥20fps */
+}
+
+.fps-counter.yellow {
+    color: #ffc107; /* 黄色，10-20fps */
+}
+
+.fps-counter.red {
+    color: #dc3545; /* 红色，<10fps */
+}
+
+/* 控制栏按钮样式 */
+.btn-blue, .btn-green, .btn-red, .btn-orange, .btn-teal, .btn-purple {
+    padding: 8px 12px;
+    font-size: 12px;
+}
+
+/* Toast提示框样式 */
+.toast-container {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 9999;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    max-width: 400px;
+}
+
+.toast {
+    min-width: 280px;
+    max-width: 100%;
+    padding: 16px 20px;
+    border-radius: 12px;
+    color: white;
+    font-size: 14px;
+    font-weight: 500;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    position: relative;
+    overflow: hidden;
+    transform: translateX(100%);
+    opacity: 0;
+    transition: transform 0.3s ease, opacity 0.3s ease;
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    cursor: pointer;
+}
+
+.toast::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 4px;
+    background: rgba(255, 255, 255, 0.8);
+}
+
+.toast.success {
+    background: linear-gradient(135deg, #28a745 0%, #218838 100%);
+}
+
+.toast.error {
+    background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+}
+
+.toast.warning {
+    background: linear-gradient(135deg, #fd7e14 0%, #e96900 100%);
+}
+
+.toast.info {
+    background: linear-gradient(135deg, #17a2b8 0%, #138496 100%);
+}
+
+.toast.show {
+    transform: translateX(0);
+    opacity: 1;
+}
+
+.toast.hide {
+    transform: translateX(100%);
+    opacity: 0;
+}
+
+.toast-content {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.toast-icon {
+    font-size: 18px;
+}
+
+.toast-message {
+    flex: 1;
+    word-break: break-word;
+}
+
+.toast-progress {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    height: 2px;
+    background: rgba(255, 255, 255, 0.6);
+    width: 100%;
+    transition: width 0.1s linear;
+}
+
+/* Toast加载图标 */
+.toast-loading {
+    width: 16px;
+    height: 16px;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-top: 2px solid white;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+@media (max-width: 480px) {
+    .container {
+        padding: 12px;
+    }
+    .nav-bar {
+        padding: 8px;
+        margin-bottom: 12px;
+    }
+    .nav-btn {
+        min-width: 70px;
+        padding: 8px;
+        font-size: 11px;
+    }
+    .card {
+        padding: 16px;
+        margin-bottom: 12px;
+    }
+    h2 {
+        font-size: 16px;
+    }
+    input {
+        padding: 12px;
+        font-size: 14px;
+    }
+    button {
+        padding: 13px;
+        font-size: 14px;
+    }
+    
+    /* 移动端Toast适配 */
+    .toast-container {
+        top: 10px;
+        right: 10px;
+        left: 10px;
+        max-width: none;
+        width: 90%;
+        margin: 0 auto;
+    }
+    
+    .toast {
+        min-width: auto;
+        max-width: 100%;
+    }
+}
+</style>
+</head>
+
+<body>
+<div class="container">
+
+<div class="nav-bar">
+<button class="nav-btn btn-red active" onclick="showSection('system')">系统控制</button>
+<button class="nav-btn btn-orange" onclick="showSection('cmd')">执行命令</button>
+<button class="nav-btn btn-green" onclick="showSection('info')">系统信息</button>
+<button class="nav-btn btn-teal" onclick="showSection('screen')">屏幕画面</button>
+<button class="nav-btn btn-purple" onclick="showSection('message')">消息中心</button>
+<button class="nav-btn btn-blue" onclick="showSection('file')">文件管理</button>
+<button class="nav-btn btn-blue" onclick="showSection('about')">关于</button>
+</div>
+
+<!-- 关于卡片 -->
+<div class="card" id="about-section" style="display: none;">
+<div style="text-align: center; margin-bottom: 15px;">
+<div style="font-size: 48px; margin-bottom: 10px;">🖥️</div>
+<h1 style="font-size: 18px; font-weight: bold; margin: 0 0 5px 0; color: #333;">电脑控制中心</h1>
+<p style="font-size: 14px; color: #666; margin: 0;">v1.2.6</p>
+</div>
+<div style="background: #f8f9fa; border-radius: 8px; overflow: hidden;">
+<div style="padding: 10px; background: #e9ecef; font-weight: bold; display: flex; align-items: center; gap: 8px; border-bottom: 1px solid #dee2e6;">
+<span>📋</span>
+<span>更新日志</span>
+</div>
+<div style="max-height: 120px; overflow-y: auto; padding: 10px;">
+<div style="margin-bottom: 15px;">
+<div style="font-weight: bold; margin-bottom: 5px;">v1.2.6</div>
+<ul style="margin: 0; padding-left: 20px; list-style-type: disc;">
+<li>新增文件管理功能，支持发送文件到电脑</li>
+<li>新增实时屏幕FPS显示（有点不准确）</li>
+<li>新增实时连接状态显示</li>
+<li>修复文件传输功能的内存泄漏问题，改为磁盘流式存储</li>
+</ul>
+</div>
+<div style="margin-bottom: 15px;">
+<div style="font-weight: bold; margin-bottom: 5px;">v1.2.5</div>
+<ul style="margin: 0; padding-left: 20px; list-style-type: disc;">
+<li>新增右上角提示框系统，支持成功/错误/警告/信息四种类型</li>
+<li>新增实时画面画质选择（低/中/高三档）</li>
+<li>新增实时画面帧率选择（5/10/15/24/30/45/60 FPS）</li>
+<li>消息系统改为服务器推送机制（SSE），实时接收电脑端回复</li>
+<li>优化实时画面，改为MJPEG流，降低延迟和带宽占用</li>
+<li>新增设置持久化功能，画质和帧率设置自动保存</li>
+</ul>
+</div>
+<div style="margin-bottom: 15px;">
+<div style="font-weight: bold; margin-bottom: 5px;">v1.2.0</div>
+<ul style="margin: 0; padding-left: 20px; list-style-type: disc;">
+<li>新增消息中心双向通信</li>
+<li>新增应用管理功能（查看/停止运行应用）</li>
+<li>新增关于页面和版本信息展示</li>
+<li>修复实时画面内存泄漏问题</li>
+</ul>
+</div>
+<div style="margin-bottom: 15px;">
+<div style="font-weight: bold; margin-bottom: 5px;">v1.1.0</div>
+<ul style="margin: 0; padding-left: 20px; list-style-type: disc;">
+<li>新增屏幕截图功能</li>
+<li>新增系统日志查看功能</li>
+<li>优化内存和磁盘数据的格式化显示</li>
+<li>新增响应式设计，适配移动端访问</li>
+<li>修复网络数据单位显示错误</li>
+</ul>
+</div>
+<div style="margin-bottom: 15px;">
+<div style="font-weight: bold; margin-bottom: 5px;">v1.0.0</div>
+<ul style="margin: 0; padding-left: 20px; list-style-type: disc;">
+<li>首个正式版本发布</li>
+<li>新增定时关机功能</li>
+<li>新增取消关机功能</li>
+<li>新增系统启动时间显示</li>
+<li>新增休眠功能</li>
+<li>完善错误提示机制</li>
+</ul>
+</div>
+<div style="margin-bottom: 15px;">
+<div style="font-weight: bold; margin-bottom: 5px;">v0.9.0</div>
+<ul style="margin: 0; padding-left: 20px; list-style-type: disc;">
+<li>新增系统信息实时刷新功能</li>
+<li>新增磁盘使用情况显示</li>
+<li>新增网络流量统计（发送/接收）</li>
+<li>优化页面布局，采用卡片式设计</li>
+<li>修复部分浏览器兼容性问题</li>
+</ul>
+</div>
+<div style="margin-bottom: 15px;">
+<div style="font-weight: bold; margin-bottom: 5px;">v0.8.0</div>
+<ul style="margin: 0; padding-left: 20px; list-style-type: disc;">
+<li>项目初始版本，基础框架搭建</li>
+<li>实现核心系统控制功能（关机、重启、锁屏）</li>
+<li>支持执行基础CMD命令</li>
+<li>简单的系统信息展示（CPU、内存）</li>
+</ul>
+</div>
+</div>
+</div>
+</div>
+
+<div class="card" id="system-section">
+<h2>🔌 系统控制</h2>
+<div style="margin-bottom: 15px; padding: 10px; background: #f8f9fa; border-radius: 8px;">
+<h3 style="margin-top: 0; margin-bottom: 10px; font-size: 14px; color: #495057;">定时关机</h3>
+<input type="number" id="sec" value="60" placeholder="秒数" style="margin-bottom: 10px;">
+<button class="btn-blue" onclick="setTimer()">开始倒计时</button>
+</div>
+<button class="btn-red" onclick="shutdown()">立即关机</button>
+<button class="btn-orange" onclick="restart()">重启电脑</button>
+<button class="btn-teal" onclick="sleep()">休眠</button>
+<button class="btn-purple" onclick="lock()">锁屏</button>
+<button class="btn-green" onclick="abort()">取消关机</button>
+</div>
+
+<div class="card" id="cmd-section" style="display: none;">
+<h2>⌨️ 执行命令</h2>
+<input type="text" id="cmd" placeholder="输入CMD命令">
+<button class="btn-blue" onclick="runCmd()">执行</button>
+
+<div style="margin-top: 15px; padding: 10px; background: #f8f9fa; border-radius: 8px;">
+<h3 style="margin-top: 0; margin-bottom: 10px; font-size: 14px; color: #495057;">应用管理</h3>
+<button class="btn-blue" onclick="getRunningApps()">获取运行应用</button>
+<div id="app-list" style="max-height: 200px; overflow-y: auto; padding: 10px; background: #fff; border-radius: 6px; font-family: monospace; font-size: 11px; border: 1px solid #e9ecef; margin: 10px 0;">
+<p>点击上方按钮获取运行中的应用</p>
+</div>
+<input type="text" id="app-name" placeholder="输入要停止的应用名称（如 notepad.exe）" style="margin-bottom: 10px;">
+<button class="btn-red" onclick="stopApp()">停止应用</button>
+</div>
+</div>
+
+<div class="card" id="info-section" style="display: none;">
+<h2>📊 系统信息</h2>
+<div id="sysinfo-content">
+<p>CPU使用率: <span id="cpu-percent">--</span>%</p>
+<p>内存使用: <span id="mem-used">--</span>GB / <span id="mem-total">--</span>GB (<span id="mem-percent">--</span>%)</p>
+<p>磁盘使用: <span id="disk-used">--</span>GB / <span id="disk-total">--</span>GB (<span id="disk-percent">--</span>%)</p>
+<p>网络发送: <span id="net-sent">--</span>MB</p>
+<p>网络接收: <span id="net-recv">--</span>MB</p>
+<p>系统启动: <span id="sys-boot-time">--</span></p>
+</div>
+<button class="btn-green" onclick="getSysInfo()">刷新系统信息</button>
+
+<div style="margin-top: 15px; padding: 10px; background: #f8f9fa; border-radius: 8px;">
+<h3 style="margin-top: 0; margin-bottom: 10px; font-size: 14px; color: #495057;">系统日志</h3>
+<div id="syslog-content" style="max-height: 200px; overflow-y: auto; padding: 10px; background: #fff; border-radius: 6px; font-family: monospace; font-size: 11px; border: 1px solid #e9ecef;">
+<p>加载日志中...</p>
+</div>
+<button class="btn-blue" onclick="getSysLog()">刷新日志</button>
+</div>
+</div>
+
+<div class="card" id="screen-section" style="display: none;">
+<h2>🖥️ 屏幕画面</h2>
+<div style="text-align: center; margin-bottom: 10px;">
+<img id="screen-image" src="" alt="屏幕画面" style="max-width: 100%; max-height: 400px; border-radius: 8px; border: 1px solid #ddd;">
+</div>
+<div style="margin-top: 10px; display: flex; flex-wrap: wrap; gap: 8px; align-items: center;">
+<button class="btn-blue" onclick="getScreenShot()">获取屏幕截图</button>
+<button class="btn-green" onclick="startRealTimeScreen()">开始实时画面</button>
+<button class="btn-red" onclick="stopRealTimeScreen()">停止实时画面</button>
+<button class="btn-orange" id="quality-btn" onclick="toggleQuality()">画质: 高</button>
+<div class="fps-control">
+<button class="btn-teal" id="fps-btn" onclick="toggleFpsDropdown()">帧率: 24</button>
+<div id="fps-dropdown" class="fps-dropdown" style="display: none;">
+<div class="fps-option" onclick="setFps(5)">5</div>
+<div class="fps-option" onclick="setFps(10)">10</div>
+<div class="fps-option" onclick="setFps(15)">15</div>
+<div class="fps-option" onclick="setFps(24)">24</div>
+<div class="fps-option" onclick="setFps(30)">30</div>
+<div class="fps-option" onclick="setFps(45)">45</div>
+<div class="fps-option" onclick="setFps(60)">60</div>
+</div>
+</div>
+<div id="fps-counter" class="fps-counter">当前: 24 FPS</div>
+</div>
+<div style="margin-top: 10px; font-size: 12px; color: #666;">
+<p>实时画面通过MJPEG流实现，低延迟、省带宽</p>
+</div>
+</div>
+
+<div class="card" id="message-section" style="display: none;">
+<h2>💬 消息中心</h2>
+<div style="margin-bottom: 15px; padding: 10px; background: #f8f9fa; border-radius: 8px;">
+<h3 style="margin-top: 0; margin-bottom: 10px; font-size: 14px; color: #495057;">发送消息</h3>
+<input type="text" id="message-input" placeholder="输入要发送的消息">
+<button class="btn-blue" onclick="sendMessage()">发送消息</button>
+</div>
+
+<div style="margin-top: 15px; padding: 10px; background: #f8f9fa; border-radius: 8px;">
+<h3 style="margin-top: 0; margin-bottom: 10px; font-size: 14px; color: #495057;">消息历史</h3>
+<div id="message-history" style="max-height: 300px; overflow-y: auto; padding: 10px; background: #fff; border-radius: 6px; font-family: monospace; font-size: 11px; border: 1px solid #e9ecef;">
+<p>消息历史将显示在这里</p>
+</div>
+<button class="btn-green" onclick="getMessageHistory()">获取消息历史</button>
+</div>
+
+<div style="margin-top: 10px; font-size: 12px; color: #666;">
+<p>消息中心支持向电脑发送弹出消息，并接收电脑的回复</p>
+</div>
+</div>
+
+<div class="card" id="file-section" style="display: none;">
+<h2>📁 文件管理</h2>
+<div style="margin-bottom: 15px; padding: 10px; background: #f8f9fa; border-radius: 8px;">
+<h3 style="margin-top: 0; margin-bottom: 10px; font-size: 14px; color: #495057;">发送到电脑</h3>
+<input type="file" id="file-input" style="margin-bottom: 10px;">
+<div style="display: flex; gap: 8px;">
+<button class="btn-blue" onclick="sendFile()">发送</button>
+<button class="btn-red" onclick="cancelFile()">取消</button>
+</div>
+
+<!-- 进度条区域 -->
+<div id="upload-progress" style="margin-top: 15px; display: none;">
+<div id="progress-file-info" style="margin-bottom: 8px; font-size: 14px;"></div>
+<div style="background: #e9ecef; border-radius: 8px; overflow: hidden; margin-bottom: 8px;">
+<div id="progress-bar" style="height: 20px; background: linear-gradient(90deg, #007bff, #0069d9); width: 0%; transition: width 0.3s ease; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; font-size: 12px;"></div>
+</div>
+<div style="display: flex; justify-content: space-between; align-items: center; font-size: 12px; color: #666;">
+<div id="progress-details"></div>
+<button class="btn-red" id="cancel-upload" style="padding: 4px 8px; font-size: 11px; width: auto;">取消上传</button>
+</div>
+</div>
+</div>
+
+<div style="margin-top: 15px;">
+<h3 style="margin-top: 0; margin-bottom: 10px; font-size: 14px; color: #495057;">最近发送：</h3>
+<div id="recent-files" style="max-height: 200px; overflow-y: auto; padding: 10px; background: #f8f9fa; border-radius: 8px;">
+<p>暂无发送记录</p>
+</div>
+</div>
+</div>
+
+</div>
+
+<script>
+function setTimer(){
+    let s = document.getElementById('sec').value;
+    fetch('/timer?s='+s);
+    alert('已设置 ' + s + ' 秒后关机');
+}
+function shutdown(){
+    if(confirm('确定要关机吗？')){
+        fetch('/shutdown');
+        alert('已执行关机');
+    }
+}
+function restart(){
+    if(confirm('确定要重启吗？')){
+        fetch('/restart');
+        alert('已执行重启');
+    }
+}
+function sleep(){
+    if(confirm('确定休眠吗？')){
+        fetch('/sleep');
+        alert('已执行休眠');
+    }
+}
+function lock(){
+    if(confirm('确定锁屏吗？')){
+        fetch('/lock');
+        alert('已执行锁屏');
+    }
+}
+function abort(){
+    fetch('/abort');
+    alert('已取消');
+}
+function runCmd(){
+    let c = document.getElementById('cmd').value;
+    fetch('/run?cmd='+encodeURIComponent(c));
+    alert('已执行：'+c);
+}
+
+function getRunningApps(){
+    fetch('/running_apps')
+    .then(response => response.json())
+    .then(data => {
+        const appList = document.getElementById('app-list');
+        if(data.success){
+            let html = '';
+            data.apps.forEach(app => {
+                html += `<div style="margin-bottom: 4px;">${app.name} (PID: ${app.pid})</div>`;
+            });
+            appList.innerHTML = html;
+        } else {
+            appList.innerHTML = `<div style="color: red;">获取应用列表失败: ${data.error}</div>`;
+        }
+    })
+    .catch(error => {
+        console.error('获取应用列表失败:', error);
+        document.getElementById('app-list').innerHTML = '<div style="color: red;">获取应用列表失败</div>';
+    });
+}
+
+function stopApp(){
+    let appName = document.getElementById('app-name').value;
+    if(appName){
+        fetch(`/stop_app?name=${encodeURIComponent(appName)}`)
+        .then(response => response.json())
+        .then(data => {
+            if(data.success){
+                alert('应用已成功停止');
+                // 刷新应用列表
+                getRunningApps();
+            } else {
+                alert('停止应用失败: ' + data.error);
+            }
+        })
+        .catch(error => {
+            console.error('停止应用失败:', error);
+            alert('停止应用失败');
+        });
+    } else {
+        alert('请输入应用名称');
+    }
+}
+function getSysInfo(){
+    fetch('/sysinfo')
+    .then(response => response.json())
+    .then(data => {
+        document.getElementById('cpu-percent').textContent = data.cpu_percent;
+        document.getElementById('mem-used').textContent = data.memory.used;
+        document.getElementById('mem-total').textContent = data.memory.total;
+        document.getElementById('mem-percent').textContent = data.memory.percent;
+        document.getElementById('disk-used').textContent = data.disk.used;
+        document.getElementById('disk-total').textContent = data.disk.total;
+        document.getElementById('disk-percent').textContent = data.disk.percent;
+        document.getElementById('net-sent').textContent = data.network.bytes_sent;
+        document.getElementById('net-recv').textContent = data.network.bytes_recv;
+        if(data.system) {
+            document.getElementById('sys-boot-time').textContent = data.system.boot_time || '--';
+        }
+    });
+}
+
+function getSysLog(){
+    fetch('/syslog')
+    .then(response => response.text())
+    .then(data => {
+        document.getElementById('syslog-content').innerHTML = data;
+    });
+}
+
+// 实时屏幕相关变量
+let networkErrorShown = false;
+let currentQuality = localStorage.getItem('screenQuality') || 'high';
+let currentFps = parseInt(localStorage.getItem('screenFps')) || 24;
+let fpsDropdownVisible = false;
+let isStreaming = false;
+let frameCount = 0;
+let lastFpsTime = 0;
+let actualFps = 0;
+let lowFpsCount = 0;
+let warningShown = false;
+let fpsCalculationStarted = false;
+let frameDetectionInterval = null;
+let imgLoadHandler = null;
+
+// 初始化屏幕设置
+function initScreenSettings() {
+    // 更新按钮显示
+    updateQualityButton();
+    updateFpsButton();
+    updateFpsCounter('计算中...');
+}
+
+// 更新画质按钮显示
+function updateQualityButton() {
+    const btn = document.getElementById('quality-btn');
+    let text = '画质: ';
+    switch (currentQuality) {
+        case 'low':
+            text += '低';
+            break;
+        case 'medium':
+            text += '中';
+            break;
+        case 'high':
+            text += '高';
+            break;
+    }
+    btn.textContent = text;
+    // 保存到 localStorage
+    localStorage.setItem('screenQuality', currentQuality);
+}
+
+// 更新帧率按钮显示
+function updateFpsButton() {
+    const btn = document.getElementById('fps-btn');
+    btn.textContent = `帧率: ${currentFps}`;
+    // 保存到 localStorage
+    localStorage.setItem('screenFps', currentFps.toString());
+}
+
+// 更新 FPS 计数器显示
+function updateFpsCounter(value) {
+    const counter = document.getElementById('fps-counter');
+    
+    if (typeof value === 'string') {
+        // 显示状态文本
+        counter.className = 'fps-counter';
+        counter.innerHTML = `<span style="font-size: 14px; color: #666;">${value}</span><br>
+                             <span style="font-size: 11px; color: #999;">设置: ${currentFps} FPS（理论）</span>`;
+        return;
+    }
+    
+    const actualFps = value;
+    
+    // 确定显示颜色和图标
+    let className = 'fps-counter';
+    let icon = '✓';
+    let statusText = '';
+    
+    if (actualFps >= 20) {
+        className = 'fps-counter';
+        icon = '✓';
+    } else if (actualFps >= 10) {
+        className = 'fps-counter yellow';
+        icon = '⚠';
+    } else {
+        className = 'fps-counter red';
+        icon = '✗';
+        statusText = ' 网络卡顿';
+    }
+    
+    // 主显示
+    counter.className = className;
+    counter.innerHTML = `<span style="font-size: 16px; font-weight: bold;">${actualFps} FPS ${icon}</span>${statusText}<br>
+                         <span style="font-size: 11px; color: #666;">设置: ${currentFps} FPS | 实际: ${actualFps} FPS</span>`;
+}
+
+// 检查网络稳定性
+function checkNetworkStability(fps) {
+    if (fps < 10) {
+        lowFpsCount++;
+    } else {
+        lowFpsCount = 0;
+        warningShown = false;
+    }
+    
+    // 连续3秒实际FPS<10才提示
+    if (lowFpsCount >= 3 && !warningShown && isStreaming) {
+        showWarningToast('网络不稳定，建议降低画质', 5000);
+        warningShown = true;
+    }
+    
+    // 检测异常情况：实际FPS远低于设置值
+    if (fps < currentFps * 0.5 && fpsCalculationStarted) {
+        lowFpsCount++;
+        if (lowFpsCount >= 3 && !warningShown) {
+            showWarningToast('检测异常，请检查浏览器兼容性', 5000);
+            warningShown = true;
+        }
+    }
+}
+
+// 启动帧率检测
+function startFpsDetection() {
+    const img = document.getElementById('screen-image');
+    
+    // 重置状态
+    frameCount = 0;
+    lastFpsTime = performance.now();
+    actualFps = 0;
+    lowFpsCount = 0;
+    warningShown = false;
+    fpsCalculationStarted = false;
+    
+    // 定义load事件处理函数
+    imgLoadHandler = function() {
+        frameCount++;
+        
+        const now = performance.now();
+        if (now - lastFpsTime >= 1000) {
+            actualFps = Math.min(frameCount, currentFps);
+            
+            if (actualFps === 0 && isStreaming) {
+                updateFpsCounter('连接中...');
+            } else {
+                updateFpsCounter(actualFps);
+                
+                // 检查网络稳定性（延迟5秒后开始）
+                if (fpsCalculationStarted && isStreaming) {
+                    checkNetworkStability(actualFps);
+                }
+            }
+            
+            frameCount = 0;
+            lastFpsTime = now;
+        }
+    };
+    
+    // 绑定load事件
+    img.onload = imgLoadHandler;
+    
+    // 延迟5秒后再开始判断网络稳定性
+    setTimeout(() => {
+        fpsCalculationStarted = true;
+    }, 5000);
+}
+
+// 停止帧率检测
+function stopFpsDetection() {
+    const img = document.getElementById('screen-image');
+    
+    // 解绑load事件
+    if (imgLoadHandler) {
+        img.onload = null;
+        imgLoadHandler = null;
+    }
+    
+    fpsCalculationStarted = false;
+    updateFpsCounter('计算中...');
+}
+
+// 切换画质
+function toggleQuality() {
+    switch (currentQuality) {
+        case 'low':
+            currentQuality = 'medium';
+            break;
+        case 'medium':
+            currentQuality = 'high';
+            break;
+        case 'high':
+            currentQuality = 'low';
+            break;
+    }
+    updateQualityButton();
+    
+    // 保存到 localStorage
+    localStorage.setItem('screenQuality', currentQuality);
+    
+    // 实时画面开启时，自动应用新参数
+    if (isStreaming) {
+        const img = document.getElementById('screen-image');
+        if (img.src.includes('/stream')) {
+            const streamUrl = `http://${window.location.hostname}:5002/stream?quality=${currentQuality}&fps=${currentFps}`;
+            img.src = streamUrl;
+        }
+    }
+    // 零提示：不显示任何toast
+}
+
+// 切换帧率下拉菜单
+function toggleFpsDropdown() {
+    const dropdown = document.getElementById('fps-dropdown');
+    fpsDropdownVisible = !fpsDropdownVisible;
+    dropdown.style.display = fpsDropdownVisible ? 'block' : 'none';
+    
+    // 点击其他地方关闭下拉菜单
+    if (fpsDropdownVisible) {
+        setTimeout(() => {
+            document.addEventListener('click', closeFpsDropdown);
+        }, 10);
+    }
+}
+
+// 关闭帧率下拉菜单
+function closeFpsDropdown(event) {
+    if (!event.target.closest('.fps-control')) {
+        const dropdown = document.getElementById('fps-dropdown');
+        dropdown.style.display = 'none';
+        fpsDropdownVisible = false;
+        document.removeEventListener('click', closeFpsDropdown);
+    }
+}
+
+// 设置帧率
+function setFps(fps) {
+    currentFps = fps;
+    updateFpsButton();
+    updateFpsCounter();
+    
+    // 关闭下拉菜单
+    const dropdown = document.getElementById('fps-dropdown');
+    dropdown.style.display = 'none';
+    fpsDropdownVisible = false;
+    document.removeEventListener('click', closeFpsDropdown);
+    
+    // 保存到 localStorage
+    localStorage.setItem('screenFps', currentFps.toString());
+    
+    // 实时画面开启时，自动应用新参数
+    if (isStreaming) {
+        const img = document.getElementById('screen-image');
+        if (img.src.includes('/stream')) {
+            const streamUrl = `http://${window.location.hostname}:5002/stream?quality=${currentQuality}&fps=${currentFps}`;
+            img.src = streamUrl;
+        }
+    }
+    // 零提示：不显示任何toast
+}
+
+function getScreenShot(showAlert = true){
+    const timestamp = new Date().getTime();
+    fetch(`/screenshot?_=${timestamp}`)
+    .then(response => response.blob())
+    .then(blob => {
+        const img = document.getElementById('screen-image');
+        if (img.src.startsWith('blob:')) {
+            URL.revokeObjectURL(img.src);
+        }
+        const url = URL.createObjectURL(blob);
+        img.src = url;
+        // 网络恢复，重置错误提示状态
+        networkErrorShown = false;
+    })
+    .catch(error => {
+        console.error('获取屏幕截图失败:', error);
+        if (showAlert) {
+            alert('获取屏幕截图失败，请检查网络连接');
+            networkErrorShown = true;
+        }
+    });
+}
+
+function startRealTimeScreen(){
+    const img = document.getElementById('screen-image');
+    // 重置状态
+    frameCount = 0;
+    lastFpsTime = performance.now();
+    actualFps = 0;
+    lowFpsCount = 0;
+    warningShown = false;
+    fpsCalculationStarted = false;
+    
+    // 显示初始状态
+    updateFpsCounter('连接中...');
+    
+    // 设置isStreaming标志为true
+    isStreaming = true;
+    
+    // 启动帧率检测
+    startFpsDetection();
+    
+    // 设置img的src为MJPEG流地址，带上画质、帧率参数和时间戳
+    const timestamp = new Date().getTime();
+    const streamUrl = `http://${window.location.hostname}:5002/stream?quality=${currentQuality}&fps=${currentFps}&_=${timestamp}`;
+    img.src = streamUrl;
+    
+    // 显示提示
+    showInfoToast('已开始实时画面', 2000);
+}
+
+function stopRealTimeScreen(){
+    const img = document.getElementById('screen-image');
+    // 清空img的src
+    img.src = '';
+    showInfoToast('已停止实时画面', 2000);
+    // 重置isStreaming标志为false
+    isStreaming = false;
+    // 停止帧率检测
+    stopFpsDetection();
+}
+
+// 显示指定部分，隐藏其他部分
+function showSection(section){
+    // 隐藏所有卡片
+    document.getElementById('system-section').style.display = 'none';
+    document.getElementById('cmd-section').style.display = 'none';
+    document.getElementById('info-section').style.display = 'none';
+    document.getElementById('screen-section').style.display = 'none';
+    document.getElementById('message-section').style.display = 'none';
+    document.getElementById('file-section').style.display = 'none';
+    document.getElementById('about-section').style.display = 'none';
+    
+    // 移除所有导航按钮的活动状态
+    const navButtons = document.querySelectorAll('.nav-btn');
+    navButtons.forEach(btn => btn.classList.remove('active'));
+    
+    // 显示选定的卡片
+    document.getElementById(`${section}-section`).style.display = 'block';
+    
+    // 设置对应导航按钮为活动状态
+    event.target.classList.add('active');
+    
+    // 如果显示的是系统信息，自动刷新内容
+    if (section === 'info') {
+        getSysInfo();
+        getSysLog();
+    }
+    
+    // 如果显示的是消息中心，自动获取消息历史
+    if (section === 'message') {
+        getMessageHistory();
+    }
+    
+    // 如果显示的是文件管理，自动获取最近发送记录
+    if (section === 'file') {
+        getRecentFiles();
+    }
+}
+
+// 消息相关函数
+function sendMessage(){
+    let message = document.getElementById('message-input').value;
+    if(message){
+        // 显示发送中提示
+        showInfoToast('正在发送消息...');
+        
+        fetch('/send_message?msg='+encodeURIComponent(message))
+        .then(response => response.json())
+        .then(data => {
+            if(data.success){
+                showSuccessToast('消息已发送，电脑将弹出消息框');
+                // 清空输入框
+                document.getElementById('message-input').value = '';
+                // 刷新消息历史
+                getMessageHistory();
+            } else {
+                showErrorToast('发送消息失败: ' + data.error);
+            }
+        })
+        .catch(error => {
+            console.error('发送消息失败:', error);
+            showErrorToast('发送消息失败，请检查网络连接');
+        });
+    } else {
+        showWarningToast('请输入要发送的消息');
+    }
+}
+
+function getMessageHistory(){
+    fetch('/message_history')
+    .then(response => response.json())
+    .then(data => {
+        const messageHistory = document.getElementById('message-history');
+        if(data.success){
+            if(data.messages && data.messages.length > 0){
+                let html = '';
+                data.messages.forEach(msg => {
+                    const time = new Date(msg.timestamp).toLocaleString();
+                    html += `<div style="margin-bottom: 8px; padding: 8px; background: ${msg.type === 'sent' ? '#e3f2fd' : '#e8f5e8'}; border-radius: 6px;">`;
+                    html += `<div style="font-weight: bold;">${msg.type === 'sent' ? '发送' : '接收'} (${time})</div>`;
+                    html += `<div>${msg.content}</div>`;
+                    html += `</div>`;
+                });
+                messageHistory.innerHTML = html;
+            } else {
+                messageHistory.innerHTML = '<p>暂无消息历史</p>';
+            }
+        } else {
+            messageHistory.innerHTML = `<div style="color: red;">获取消息历史失败: ${data.error}</div>`;
+        }
+    })
+    .catch(error => {
+        console.error('获取消息历史失败:', error);
+        document.getElementById('message-history').innerHTML = '<div style="color: red;">获取消息历史失败</div>';
+    });
+}
+
+// Toast提示框系统
+class ToastSystem {
+    constructor() {
+        this.container = null;
+        this.toasts = [];
+        this.init();
+    }
+    
+    // 初始化Toast容器
+    init() {
+        // 检查是否已存在容器
+        this.container = document.querySelector('.toast-container');
+        if (!this.container) {
+            this.container = document.createElement('div');
+            this.container.className = 'toast-container';
+            document.body.appendChild(this.container);
+        }
+    }
+    
+    // 显示Toast
+    show(message, type = 'success', duration = 3000) {
+        // 创建Toast元素
+        const toast = document.createElement('div');
+        toast.className = `toast ${type}`;
+        
+        // 设置内容
+        const content = document.createElement('div');
+        content.className = 'toast-content';
+        
+        // 添加图标
+        const icon = document.createElement('div');
+        icon.className = 'toast-icon';
+        switch (type) {
+            case 'success':
+                icon.textContent = '✓';
+                break;
+            case 'error':
+                icon.textContent = '✗';
+                break;
+            case 'warning':
+                icon.textContent = '⚠';
+                break;
+            case 'info':
+                icon.textContent = 'ℹ';
+                break;
+        }
+        
+        // 添加消息
+        const messageEl = document.createElement('div');
+        messageEl.className = 'toast-message';
+        messageEl.textContent = message;
+        
+        // 添加进度条
+        const progress = document.createElement('div');
+        progress.className = 'toast-progress';
+        
+        // 组装元素
+        content.appendChild(icon);
+        content.appendChild(messageEl);
+        toast.appendChild(content);
+        toast.appendChild(progress);
+        
+        // 添加到容器
+        this.container.appendChild(toast);
+        
+        // 动画显示
+        setTimeout(() => {
+            toast.classList.add('show');
+        }, 10);
+        
+        // 存储Toast信息
+        const toastInfo = {
+            element: toast,
+            progress: progress,
+            duration: duration,
+            startTime: Date.now(),
+            pausedTime: 0,
+            isPaused: false,
+            interval: null
+        };
+        this.toasts.push(toastInfo);
+        
+        // 开始进度条动画
+        this.startProgress(toastInfo);
+        
+        // 鼠标悬停暂停
+        toast.addEventListener('mouseenter', () => {
+            this.pauseToast(toastInfo);
+        });
+        
+        // 鼠标移出继续
+        toast.addEventListener('mouseleave', () => {
+            this.resumeToast(toastInfo);
+        });
+        
+        // 点击关闭
+        toast.addEventListener('click', () => {
+            this.hideToast(toastInfo);
+        });
+        
+        return toastInfo;
+    }
+    
+    // 开始进度条动画
+    startProgress(toastInfo) {
+        const { element, progress, duration, startTime } = toastInfo;
+        
+        toastInfo.interval = setInterval(() => {
+            if (toastInfo.isPaused) return;
+            
+            const elapsed = Date.now() - startTime - toastInfo.pausedTime;
+            const percentage = Math.max(0, 1 - (elapsed / duration));
+            
+            progress.style.width = `${percentage * 100}%`;
+            
+            if (elapsed >= duration) {
+                clearInterval(toastInfo.interval);
+                this.hideToast(toastInfo);
+            }
+        }, 10);
+    }
+    
+    // 暂停Toast
+    pauseToast(toastInfo) {
+        if (!toastInfo.isPaused) {
+            toastInfo.isPaused = true;
+            clearInterval(toastInfo.interval);
+        }
+    }
+    
+    // 继续Toast
+    resumeToast(toastInfo) {
+        if (toastInfo.isPaused) {
+            toastInfo.isPaused = false;
+            toastInfo.startTime = Date.now() - (toastInfo.duration - (toastInfo.progress.offsetWidth / toastInfo.element.offsetWidth) * toastInfo.duration);
+            this.startProgress(toastInfo);
+        }
+    }
+    
+    // 隐藏Toast
+    hideToast(toastInfo) {
+        clearInterval(toastInfo.interval);
+        
+        const { element } = toastInfo;
+        element.classList.remove('show');
+        element.classList.add('hide');
+        
+        setTimeout(() => {
+            if (element.parentNode) {
+                element.parentNode.removeChild(element);
+            }
+            
+            // 从数组中移除
+            const index = this.toasts.findIndex(info => info.element === element);
+            if (index > -1) {
+                this.toasts.splice(index, 1);
+            }
+        }, 300);
+    }
+    
+    // 显示成功Toast
+    success(message, duration = 3000) {
+        return this.show(message, 'success', duration);
+    }
+    
+    // 显示错误Toast
+    error(message, duration = 4000) {
+        return this.show(message, 'error', duration);
+    }
+    
+    // 显示警告Toast
+    warning(message, duration = 3500) {
+        return this.show(message, 'warning', duration);
+    }
+    
+    // 显示信息Toast
+    info(message, duration = 3000) {
+        return this.show(message, 'info', duration);
+    }
+}
+
+// 初始化Toast系统
+const toastSystem = new ToastSystem();
+
+// 全局showToast函数
+function showToast(message, type = 'success', duration = 3000) {
+    return toastSystem.show(message, type, duration);
+}
+
+// 便捷方法
+function showSuccessToast(message, duration) {
+    return toastSystem.success(message, duration);
+}
+
+function showErrorToast(message, duration) {
+    return toastSystem.error(message, duration);
+}
+
+function showWarningToast(message, duration) {
+    return toastSystem.warning(message, duration);
+}
+
+function showInfoToast(message, duration) {
+    return toastSystem.info(message, duration);
+}
+
+// 文件管理相关函数
+let xhr = null;
+let uploadStartTime = 0;
+let uploadStartBytes = 0;
+let uploadSpeed = 0;
+let uploadSpeedUpdateInterval = null;
+
+function sendFile() {
+    const fileInput = document.getElementById('file-input');
+    const file = fileInput.files[0];
+    
+    if (!file) {
+        showWarningToast('请选择要发送的文件');
+        return;
+    }
+    
+    // 检查文件类型（禁止执行文件）
+    const executableExtensions = ['.exe', '.bat', '.cmd', '.com', '.msi', '.ps1', '.js', '.vbs'];
+    const fileName = file.name.toLowerCase();
+    for (const ext of executableExtensions) {
+        if (fileName.endsWith(ext)) {
+            showErrorToast('禁止发送执行文件');
+            return;
+        }
+    }
+    
+    // 显示进度条
+    const progressArea = document.getElementById('upload-progress');
+    const progressFileInfo = document.getElementById('progress-file-info');
+    const progressBar = document.getElementById('progress-bar');
+    const progressDetails = document.getElementById('progress-details');
+    
+    // 计算文件大小
+    const fileSize = file.size;
+    const fileSizeFormatted = formatFileSize(fileSize);
+    
+    // 更新进度条信息
+    progressFileInfo.textContent = `文件名: ${file.name} (${fileSizeFormatted})`;
+    progressBar.style.width = '0%';
+    progressBar.textContent = '0%';
+    progressDetails.textContent = '0MB/0MB | 速度: 0KB/s | 剩余时间: 计算中...';
+    progressArea.style.display = 'block';
+    
+    // 重置上传状态
+    uploadStartTime = Date.now();
+    uploadStartBytes = 0;
+    uploadSpeed = 0;
+    
+    // 创建FormData
+    const formData = new FormData();
+    formData.append('file', file);
+    
+    // 创建XMLHttpRequest
+    xhr = new XMLHttpRequest();
+    
+    // 上传进度事件
+    xhr.upload.onprogress = function(e) {
+        if (e.lengthComputable) {
+            const loaded = e.loaded;
+            const total = e.total;
+            const percent = Math.round((loaded / total) * 100);
+            
+            // 计算上传速度
+            const now = Date.now();
+            const elapsed = (now - uploadStartTime) / 1000; // 秒
+            
+            if (elapsed > 0.5) { // 每0.5秒计算一次速度
+                uploadSpeed = (loaded - uploadStartBytes) / elapsed / (1024 * 1024); // MB/s
+                uploadStartBytes = loaded;
+                uploadStartTime = now;
+            }
+            
+            // 计算剩余时间
+            const remainingBytes = total - loaded;
+            const remainingTime = uploadSpeed > 0 ? remainingBytes / (uploadSpeed * 1024 * 1024) : 0;
+            
+            // 格式化数据
+            const loadedFormatted = formatFileSize(loaded);
+            const speedFormatted = uploadSpeed < 1 ? `${(uploadSpeed * 1024).toFixed(1)}KB/s` : `${uploadSpeed.toFixed(1)}MB/s`;
+            const remainingFormatted = formatTime(remainingTime);
+            
+            // 更新进度条
+            progressBar.style.width = `${percent}%`;
+            progressBar.textContent = `${percent}%`;
+            
+            // 更新进度详情
+            progressDetails.textContent = `${loadedFormatted}/${fileSizeFormatted} | 速度: ${speedFormatted} | 剩余时间: ${remainingFormatted}`;
+            
+            // 动态改变进度条颜色
+            if (percent < 50) {
+                progressBar.style.background = 'linear-gradient(90deg, #007bff, #0069d9)';
+            } else if (percent < 90) {
+                progressBar.style.background = 'linear-gradient(90deg, #ffc107, #e0a800)';
+            } else {
+                progressBar.style.background = 'linear-gradient(90deg, #28a745, #218838)';
+            }
+        }
+    };
+    
+    // 上传完成事件
+    xhr.onload = function() {
+        clearInterval(uploadSpeedUpdateInterval);
+        if (xhr.status === 200) {
+            try {
+                const data = JSON.parse(xhr.responseText);
+                if (data.success) {
+                    showSuccessToast('文件上传成功，等待电脑端确认');
+                    // 清空文件输入
+                    fileInput.value = '';
+                    // 更新最近发送列表
+                    getRecentFiles();
+                } else {
+                    showErrorToast('文件上传失败: ' + data.error);
+                }
+            } catch (error) {
+                showErrorToast('文件上传失败: 服务器响应格式错误');
+            }
+        } else {
+            showErrorToast('文件上传失败: 服务器错误');
+        }
+        // 隐藏进度条
+        setTimeout(() => {
+            progressArea.style.display = 'none';
+        }, 1000);
+    };
+    
+    // 上传错误事件
+    xhr.onerror = function() {
+        clearInterval(uploadSpeedUpdateInterval);
+        showErrorToast('文件上传失败，请检查网络连接');
+        // 隐藏进度条
+        setTimeout(() => {
+            progressArea.style.display = 'none';
+        }, 1000);
+    };
+    
+    // 上传取消事件
+    xhr.onabort = function() {
+        clearInterval(uploadSpeedUpdateInterval);
+        showInfoToast('上传已取消');
+        // 隐藏进度条
+        setTimeout(() => {
+            progressArea.style.display = 'none';
+        }, 1000);
+    };
+    
+    // 发送请求
+    xhr.open('POST', '/upload', true);
+    xhr.send(formData);
+    
+    // 绑定取消按钮事件
+    document.getElementById('cancel-upload').onclick = function() {
+        if (xhr) {
+            xhr.abort();
+        }
+    };
+}
+
+function cancelFile() {
+    document.getElementById('file-input').value = '';
+    // 隐藏进度条
+    document.getElementById('upload-progress').style.display = 'none';
+    // 取消正在进行的上传
+    if (xhr) {
+        xhr.abort();
+    }
+    showInfoToast('已取消文件选择');
+}
+
+// 格式化文件大小
+function formatFileSize(bytes) {
+    if (bytes < 1024) {
+        return bytes + 'B';
+    } else if (bytes < 1024 * 1024) {
+        return (bytes / 1024).toFixed(1) + 'KB';
+    } else if (bytes < 1024 * 1024 * 1024) {
+        return (bytes / (1024 * 1024)).toFixed(1) + 'MB';
+    } else {
+        return (bytes / (1024 * 1024 * 1024)).toFixed(1) + 'GB';
+    }
+}
+
+// 格式化时间
+function formatTime(seconds) {
+    if (seconds < 60) {
+        return `约${Math.ceil(seconds)}秒`;
+    } else {
+        const minutes = Math.floor(seconds / 60);
+        const remainingSeconds = Math.ceil(seconds % 60);
+        return `约${minutes}分${remainingSeconds}秒`;
+    }
+}
+
+function getRecentFiles() {
+    fetch('/recent_files')
+    .then(response => response.json())
+    .then(data => {
+        const recentFiles = document.getElementById('recent-files');
+        if (data.success && data.files.length > 0) {
+            let html = '';
+            data.files.forEach(file => {
+                let statusIcon = '⏳';
+                let statusText = '等待中';
+                
+                switch (file.status) {
+                    case 'completed':
+                        statusIcon = '✓';
+                        statusText = '已接收';
+                        break;
+                    case 'rejected':
+                        statusIcon = '✗';
+                        statusText = '对方拒绝';
+                        break;
+                    case 'transferring':
+                        statusIcon = '📊';
+                        statusText = '传输中';
+                        break;
+                }
+                
+                html += `<div style="margin-bottom: 8px; padding: 8px; background: #e3f2fd; border-radius: 6px; display: flex; justify-content: space-between; align-items: center;">`;
+                html += `<div>`;
+                html += `<div style="font-weight: bold;">${file.name}</div>`;
+                html += `<div style="font-size: 12px; color: #666;">${file.size} ${statusText}</div>`;
+                html += `</div>`;
+                html += `<div style="font-size: 16px;">${statusIcon}</div>`;
+                html += `</div>`;
+            });
+            recentFiles.innerHTML = html;
+        } else {
+            recentFiles.innerHTML = '<p>暂无发送记录</p>';
+        }
+    })
+    .catch(error => {
+        console.error('获取最近发送记录失败:', error);
+        document.getElementById('recent-files').innerHTML = '<p style="color: red;">获取记录失败</p>';
+    });
+}
+
+// SSE连接相关变量
+let source = null;
+let reconnectAttempts = 0;
+let maxReconnectDelay = 30000;
+let lastMessageId = 0;
+let lastHeartbeatTime = Date.now();
+let heartbeatInterval = null;
+let connectionStatusToast = null;
+let hasShownConnected = false;  // 首次连接是否已提示
+let isReconnecting = false;     // 是否正在重连
+let lastConnectionState = null;   // 上次状态
+
+// 初始化SSE连接
+function initSSE() {
+    try {
+        // 只有在重连时才显示连接中状态
+        if (isReconnecting) {
+            showConnectionStatus('connecting');
+        }
+        
+        // 创建SSE连接
+        const url = '/events';
+        console.log('正在建立SSE连接:', url);
+        source = new EventSource(url);
+        
+        source.onopen = function() {
+            console.log('SSE连接已建立');
+            // 重置重连尝试次数
+            reconnectAttempts = 0;
+            
+            // 根据连接状态显示不同提示
+            if (lastConnectionState === 'disconnected') {
+                // 重连成功
+                showConnectionStatus('connected');
+            } else if (!hasShownConnected) {
+                // 首次连接，静默
+                hasShownConnected = true;
+            }
+            
+            // 更新状态
+            lastConnectionState = 'connected';
+            isReconnecting = false;
+            
+            // 补全离线期间的消息
+            fetchMissedMessages();
+            // 重置心跳时间
+            lastHeartbeatTime = Date.now();
+            // 启动心跳检测
+            startHeartbeatCheck();
+        };
+        
+        source.onmessage = function(event) {
+            try {
+                console.log('收到SSE消息:', event.data);
+                // 更新心跳时间
+                lastHeartbeatTime = Date.now();
+                
+                // 处理心跳消息
+                if (event.data === 'ping') {
+                    return;
+                }
+                
+                // 处理连接确认消息
+                if (event.data === 'connected') {
+                    return;
+                }
+                
+                // 解析消息数据
+                const data = JSON.parse(event.data);
+                console.log('解析后的SSE消息:', data);
+                
+                // 更新最后消息ID
+                if (data.id) {
+                    lastMessageId = data.id;
+                }
+                
+                // 处理消息格式
+                let message = data;
+                if (data.type && data.message) {
+                    message = data.message;
+                }
+                
+                // 处理文件状态更新
+                if (data.type === 'file_status') {
+                    getRecentFiles();
+                    if (data.status === 'completed') {
+                        showSuccessToast(`文件 ${data.file_name} 已被接收`);
+                    } else if (data.status === 'rejected') {
+                        showErrorToast(`文件 ${data.file_name} 被拒绝`);
+                    } else if (data.status === 'transferring') {
+                        showInfoToast(`文件 ${data.file_name} 正在传输中`);
+                    }
+                    return;
+                }
+                
+                // 刷新消息历史
+                getMessageHistory();
+                
+                // 显示Toast提示
+                if (message.type === 'received') {
+                    showSuccessToast(`收到回复: ${message.content}`);
+                }
+            } catch (error) {
+                console.error('处理SSE消息失败:', error);
+                showErrorToast('处理消息失败，请重试');
+            }
+        };
+        
+        source.onerror = function(error) {
+            console.error('SSE错误:', error);
+            // 关闭连接
+            if (source) {
+                source.close();
+            }
+            // 计算重连延迟
+            const delay = Math.min(1000 * Math.pow(2, reconnectAttempts), maxReconnectDelay);
+            
+            // 只有状态变化时才显示提示
+            if (lastConnectionState !== 'disconnected') {
+                showConnectionStatus('disconnected', Math.round(delay / 1000));
+                lastConnectionState = 'disconnected';
+            }
+            
+            // 更新状态
+            isReconnecting = true;
+            
+            // 延迟后重连
+            setTimeout(initSSE, delay);
+            // 增加重连尝试次数
+            reconnectAttempts++;
+            // 清除心跳检测
+            clearHeartbeatCheck();
+        };
+    } catch (error) {
+        console.error('初始化SSE失败:', error);
+        // 计算重连延迟
+        const delay = Math.min(1000 * Math.pow(2, reconnectAttempts), maxReconnectDelay);
+        
+        // 只有状态变化时才显示提示
+        if (lastConnectionState !== 'disconnected') {
+            showConnectionStatus('disconnected', Math.round(delay / 1000));
+            lastConnectionState = 'disconnected';
+        }
+        
+        // 更新状态
+        isReconnecting = true;
+        
+        // 延迟后重连
+        setTimeout(initSSE, delay);
+        // 增加重连尝试次数
+        reconnectAttempts++;
+    }
+}
+
+// 显示连接状态
+function showConnectionStatus(status, delaySeconds = 0) {
+    // 清除之前的状态提示
+    if (connectionStatusToast) {
+        toastSystem.hideToast(connectionStatusToast);
+    }
+    
+    switch (status) {
+        case 'connecting':
+            connectionStatusToast = toastSystem.info('🟡 连接中...', 0);
+            break;
+        case 'connected':
+            connectionStatusToast = toastSystem.success('🟢 已恢复连接', 3000);
+            break;
+        case 'disconnected':
+            connectionStatusToast = toastSystem.error(`🔴 连接断开，${delaySeconds}秒后重连`, 0); // 0表示不自动关闭
+            break;
+    }
+}
+
+// 补全离线期间的消息
+function fetchMissedMessages() {
+    if (lastMessageId > 0) {
+        fetch(`http://${window.location.hostname}:5002/missed_messages?last_id=${lastMessageId}`)
+            .then(response => response.json())
+            .then(data => {
+                if (data.success && data.messages && data.messages.length > 0) {
+                    console.log('获取到离线消息:', data.messages.length, '条');
+                    // 刷新消息历史
+                    getMessageHistory();
+                    // 显示离线消息提示
+                    showSuccessToast(`收到 ${data.messages.length} 条离线消息`);
+                }
+            })
+            .catch(error => {
+                console.error('获取离线消息失败:', error);
+            });
+    }
+}
+
+// 启动心跳检测
+function startHeartbeatCheck() {
+    // 清除之前的心跳检测
+    clearHeartbeatCheck();
+    
+    // 每10秒检查一次心跳
+    heartbeatInterval = setInterval(() => {
+        const now = Date.now();
+        // 如果超过60秒未收到消息，主动断开重连
+        if (now - lastHeartbeatTime > 60000) {
+            console.log('心跳超时，主动断开重连');
+            if (source) {
+                source.close();
+            }
+            // 触发重连
+            initSSE();
+        }
+    }, 10000);
+}
+
+// 清除心跳检测
+function clearHeartbeatCheck() {
+    if (heartbeatInterval) {
+        clearInterval(heartbeatInterval);
+        heartbeatInterval = null;
+    }
+}
+
+// 页面加载时自动获取日志
+window.onload = function(){
+    getSysLog();
+    // 初始化屏幕设置
+    initScreenSettings();
+    // 初始化SSE连接
+    initSSE();
+};
+</script>
+</body>
+</html>
