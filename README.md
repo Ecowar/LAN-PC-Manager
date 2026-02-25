@@ -20,7 +20,7 @@
 
 ### 环境要求
 - Windows 系统
-- Python 3.7+
+- Python 3.12+
 - Pillow
 - psutil
 - mss
